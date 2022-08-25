@@ -3,4 +3,4 @@ function ExpenseItem() {
         <h2>Expense Item!</h2>
     )
 }
-export default ExpenseItem
+export default ExpenseItem;

@@ -2,6 +2,10 @@ import Expenses from './components/Expenses/Expenses';
 import NewExpense from './components/NewExpense/NewExpense';
 
 const App = () => {
+  const addExpenseHandler = (saveingData) => {
+    expenses.push(saveingData)
+  }
+
   const expenses = [
     { title: 'Car Insurence', amount: 294.67, date: new Date(2022, 8, 25) },
     { title: 'Electric bills', amount: 27.34, date: new Date(2022, 8, 25) },
@@ -10,7 +14,7 @@ const App = () => {
   ];
   return (
     <div>
-      <NewExpense />
+      <NewExpense onAddExpense={addExpenseHandler} />
       <Expenses items={expenses} />
     </div>
   );

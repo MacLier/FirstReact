@@ -1,6 +1,6 @@
 import "./ChartBar.css";
 
-const CharBar = () => {
+const CharBar = props => {
 
 }
 

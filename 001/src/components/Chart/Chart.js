@@ -1,6 +1,16 @@
-import "./Chart.css"
+import "./Chart.css";
 
-const Chart = () => {
+import CharBar from "./ChartBar";
+
+const Chart = props => {
+
+    return (
+        <div className="chart">
+            {props.dataPoints.map(datapoint => {
+                <CharBar />
+            })}
+        </div>
+    )
 
 }
 

@@ -1,8 +1,17 @@
+import { Fragment } from "react";
+import AvailableMeals from "./AvailableMeals";
 import classes from "./Meals.module.css";
 
-const Meals = props => {
+import MealsSummary from "./MealsSummary";
 
-    return
+const Meals = () => {
+
+    return (
+        <Fragment>
+            <MealsSummary></MealsSummary>
+            <AvailableMeals></AvailableMeals>
+        </Fragment>
+    )
 };
 
 export default Meals;

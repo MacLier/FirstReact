@@ -17,14 +17,24 @@ const Cart = props => {
 
     const cartItemRemoveHandler = id => {
         cartCtx.removeItem(id);
-    }
+    };
     const cartItemAddHandler = item => {
         cartCtx.addItem({ ...item, amount: 1 })
-    }
+    };
 
     const orderHandler = () => {
         setIsCheckout(true);
-    }
+    };
+
+    const submitOrderHandler = (userData) => {
+        fetch("https://react-http-c672b-default-rtdb.firebaseio.com/orders.json", {
+            method: 'POST',
+            body: JSON.stringify({
+                user: userData,
+                orderedItems: cartCtx.items
+            })
+        });
+    };
 
     const cartItems = (
         <ul className={classes['cart-items']}>
@@ -52,7 +62,7 @@ const Cart = props => {
                 onClick={orderHandler}
             >Order</button>}
         </div>
-    )
+    );
 
     return (
         <Modal onClose={props.onClose}>
@@ -61,10 +71,10 @@ const Cart = props => {
                 <span>Total Amount</span>
                 <span>{totalAmount}</span>
             </div>
-            {isCheckout && <Checkout onCancel={props.onClose} />}
+            {isCheckout && <Checkout onConfirm={submitOrderHandler} onCancel={props.onClose} />}
             {!isCheckout && modalAction}
         </Modal>
-    )
-}
+    );
+};
 
 export default Cart;

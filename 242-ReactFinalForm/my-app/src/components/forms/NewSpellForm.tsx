@@ -8,29 +8,30 @@ const onSubmit = async (values: object | number) => {
   window.alert(JSON.stringify(values));
 };
 
+const required = (value: string) => (value ? undefined : "Required");
+const mustBeNumber = (value: any) =>
+  isNaN(value) ? "Must be a number." : undefined;
+const minValue = (min: number) => (value: any) =>
+  isNaN(value) || value > min ? undefined : `Should be greater than ${min}`;
+const compositeValidators =
+  (...validators: any[]) =>
+  (value: any) =>
+    validators.reduce(
+      (error, validator) => error || validator(value),
+      undefined
+    );
+
 const NewSpellForm = () => {
   return (
     <div>
       <h1>React Final Form - Simple</h1>
       <Form
         onSubmit={onSubmit}
-        validate={(values: any) => {
-          const errors = { name: "", description: "" };
-
-          if (!values.name) {
-            errors.name = "Required";
-          }
-          if (values.description.length < 10) {
-            errors.description = "Required";
-          }
-          return errors;
-        }}
         initialValues={{ type: "mage", description: "" }}
         render={({ handleSubmit, form, submitting, pristine, values }) => (
           <form onSubmit={handleSubmit}>
             <div>
-              <label>New Spell name</label>
-              <Field name="name">
+              <Field name="name" validate={required}>
                 {({ input, meta }) => (
                   <div>
                     <label>New Spell Name</label>
@@ -45,7 +46,6 @@ const NewSpellForm = () => {
               </Field>
             </div>
             <div>
-              <label>New Spell Type</label>
               <Field name="type" component="select">
                 <option value="mage">Mage</option>
                 <option value="bard">Bard</option>
@@ -58,12 +58,33 @@ const NewSpellForm = () => {
               </Field>
             </div>
             <div>
-              <label>Description</label>
-              <Field name="description">
+              <Field name="description" validate={required}>
                 {({ input, meta }) => (
                   <div>
                     <label>Description</label>
                     <input {...input} type="text" placeholder="description" />
+                    {meta.error && meta.touched && <span>{meta.error}</span>}
+                  </div>
+                )}
+              </Field>
+            </div>
+            <div>
+              <Field
+                name="requirement"
+                validate={compositeValidators(
+                  required,
+                  mustBeNumber,
+                  minValue(1)
+                )}
+              >
+                {({ input, meta }) => (
+                  <div>
+                    <label>Mana requirement</label>
+                    <input
+                      {...input}
+                      type="number"
+                      placeholder="Mana requirement"
+                    />
                     {meta.error && meta.touched && <span>{meta.error}</span>}
                   </div>
                 )}

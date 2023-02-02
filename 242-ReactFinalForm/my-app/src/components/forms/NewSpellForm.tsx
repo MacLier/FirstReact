@@ -8,25 +8,41 @@ const onSubmit = async (values: object | number) => {
   window.alert(JSON.stringify(values));
 };
 
-const NewSpellForm = (props) => {
+const NewSpellForm = () => {
   return (
     <div>
       <h1>React Final Form - Simple</h1>
       <Form
         onSubmit={onSubmit}
-        initialValues={{ type: "mage" }}
-        submitting={props.submitting}
-        pristine={props.pristine}
+        validate={(values: any) => {
+          const errors = { name: "", description: "" };
+
+          if (!values.name) {
+            errors.name = "Required";
+          }
+          if (values.description.length < 10) {
+            errors.description = "Required";
+          }
+          return errors;
+        }}
+        initialValues={{ type: "mage", description: "" }}
         render={({ handleSubmit, form, submitting, pristine, values }) => (
           <form onSubmit={handleSubmit}>
             <div>
               <label>New Spell name</label>
-              <Field
-                name="name"
-                component="input"
-                type="text"
-                placeholder="New Spell Name"
-              />
+              <Field name="name">
+                {({ input, meta }) => (
+                  <div>
+                    <label>New Spell Name</label>
+                    <input
+                      {...input}
+                      type="text"
+                      placeholder="New Spell Name"
+                    />
+                    {meta.error && meta.touched && <span>{meta.error}</span>}
+                  </div>
+                )}
+              </Field>
             </div>
             <div>
               <label>New Spell Type</label>
@@ -43,14 +59,18 @@ const NewSpellForm = (props) => {
             </div>
             <div>
               <label>Description</label>
-              <Field
-                name="description"
-                component="textarea"
-                placeholder="Description"
-              />
+              <Field name="description">
+                {({ input, meta }) => (
+                  <div>
+                    <label>Description</label>
+                    <input {...input} type="text" placeholder="description" />
+                    {meta.error && meta.touched && <span>{meta.error}</span>}
+                  </div>
+                )}
+              </Field>
             </div>
             <div>
-              <button type="submit" disabled={submitting || pristine}>
+              <button type="submit" disabled={submitting}>
                 Submit
               </button>
               <button

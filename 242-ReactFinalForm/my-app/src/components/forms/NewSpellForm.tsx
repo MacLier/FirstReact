@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, Field } from "react-final-form";
+import ErrorWithDelay from "./ErrorWithDelay";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -21,17 +22,42 @@ const compositeValidators =
       undefined
     );
 
+type FormValues = {
+  name?: string;
+  type?: string;
+  description?: string;
+  requirement?: number;
+};
+
 const NewSpellForm = () => {
   return (
     <div>
-      <h1>React Final Form - Simple</h1>
-      <Form
+      <h1>React Final Form - Example</h1>
+      <h2>Synchronous Record-Level Validation (with debounced errors)</h2>
+      <Form<FormValues>
         onSubmit={onSubmit}
         initialValues={{ type: "mage", description: "" }}
+        validate={(values) => {
+          const errors: Partial<Record<keyof FormValues, string>> = {};
+          if (!values.name) {
+            errors.name = "Required";
+          }
+          if (!values.description) {
+            errors.description = "Required";
+          }
+          if (!values.requirement) {
+            errors.requirement = "require";
+          } else if (isNaN(values.requirement)) {
+            errors.requirement = "Must be a number.";
+          } else if (values.requirement < 1) {
+            errors.requirement = "Must be > 1";
+          }
+          return errors;
+        }}
         render={({ handleSubmit, form, submitting, pristine, values }) => (
           <form onSubmit={handleSubmit}>
             <div>
-              <Field name="name" validate={required}>
+              <Field name="name">
                 {({ input, meta }) => (
                   <div>
                     <label>New Spell Name</label>
@@ -40,7 +66,9 @@ const NewSpellForm = () => {
                       type="text"
                       placeholder="New Spell Name"
                     />
-                    {meta.error && meta.touched && <span>{meta.error}</span>}
+                    <ErrorWithDelay name="name" delay={1000}>
+                      {(error: any) => <span>{error}</span>}
+                    </ErrorWithDelay>
                   </div>
                 )}
               </Field>
@@ -58,25 +86,21 @@ const NewSpellForm = () => {
               </Field>
             </div>
             <div>
-              <Field name="description" validate={required}>
+              <Field name="description">
                 {({ input, meta }) => (
                   <div>
                     <label>Description</label>
                     <input {...input} type="text" placeholder="description" />
-                    {meta.error && meta.touched && <span>{meta.error}</span>}
+                    <ErrorWithDelay name="description" delay={1000}>
+                      {(error: any) => <span>{error}</span>}
+                    </ErrorWithDelay>
+                    {/* {meta.error && meta.touched && <span>{meta.error}</span>} */}
                   </div>
                 )}
               </Field>
             </div>
             <div>
-              <Field
-                name="requirement"
-                validate={compositeValidators(
-                  required,
-                  mustBeNumber,
-                  minValue(1)
-                )}
-              >
+              <Field name="requirement">
                 {({ input, meta }) => (
                   <div>
                     <label>Mana requirement</label>
@@ -85,7 +109,10 @@ const NewSpellForm = () => {
                       type="number"
                       placeholder="Mana requirement"
                     />
-                    {meta.error && meta.touched && <span>{meta.error}</span>}
+                    <ErrorWithDelay name="requirement" delay={1000}>
+                      {(error: any) => <span>{error}</span>}
+                    </ErrorWithDelay>
+                    {/* {meta.error && meta.touched && <span>{meta.error}</span>} */}
                   </div>
                 )}
               </Field>

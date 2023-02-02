@@ -1,13 +1,39 @@
 import React from "react";
 import { Form, Field } from "react-final-form";
-import ErrorWithDelay from "./ErrorWithDelay";
 
+type FormValues = {
+  name?: string;
+  type?: string;
+  description?: string;
+  requirement?: number;
+};
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const onSubmit = async (values: object | number) => {
   await sleep(300);
   window.alert(JSON.stringify(values));
 };
+
+const Error = ({ name }: { name: string }) => (
+  <Field name={name} subscription={{ error: true, touched: true }}>
+    {({ meta: { error, touched } }) =>
+      error && touched ? <span>{error}</span> : null
+    }
+  </Field>
+);
+const Condition = ({
+  when,
+  is,
+  children,
+}: {
+  when: string;
+  is: string;
+  children: React.ReactNode;
+}) => (
+  <Field name={when} subscription={{ value: true }}>
+    {({ input: { value } }) => (value === is ? children : null)}
+  </Field>
+);
 
 const required = (value: string) => (value ? undefined : "Required");
 const mustBeNumber = (value: any) =>
@@ -21,13 +47,6 @@ const compositeValidators =
       (error, validator) => error || validator(value),
       undefined
     );
-
-type FormValues = {
-  name?: string;
-  type?: string;
-  description?: string;
-  requirement?: number;
-};
 
 const NewSpellForm = () => {
   return (
@@ -66,34 +85,72 @@ const NewSpellForm = () => {
                       type="text"
                       placeholder="New Spell Name"
                     />
-                    <ErrorWithDelay name="name" delay={1000}>
-                      {(error: any) => <span>{error}</span>}
-                    </ErrorWithDelay>
                   </div>
                 )}
               </Field>
             </div>
             <div>
-              <Field name="type" component="select">
-                <option value="mage">Mage</option>
+              <label>Type</label>
+              <div>
+                <label>
+                  <Field
+                    name="type"
+                    component="input"
+                    type="radio"
+                    value="mage"
+                  />{" "}
+                  Mage
+                </label>
+                {/* <option value="mage">Mage</option>
                 <option value="bard">Bard</option>
                 <option value="priest">Priest</option>
                 <option value="monk">Monk</option>
                 <option value="witchMaster">Witch master</option>
                 <option value="witch">Witch</option>
                 <option value="fireMage">Fire mage</option>
-                <option value="shaman">Shaman</option>
-              </Field>
+                <option value="shaman">Shaman</option> */}
+
+                <label>
+                  <Field
+                    name="type"
+                    component="input"
+                    type="radio"
+                    value="priest"
+                  />{" "}
+                  Priest
+                </label>
+              </div>
+              <Error name="type" />
             </div>
+            <Condition when="type" is="priest">
+              <div>
+                <label>Sphere</label>
+                <Field name="sphere" component="select">
+                  <option value="life">Life</option>
+                  <option value="spirit">Spirit</option>
+                  <option value="nature">Nature</option>
+                  <option value="death">Death</option>
+                </Field>
+                <Error name="type"></Error>
+              </div>
+            </Condition>
+            <Condition when="type" is="mage">
+              <div>
+                <label>There is no sphere</label>
+                <Field
+                  name="sphere"
+                  component="input"
+                  value=""
+                  disabled
+                ></Field>
+              </div>
+            </Condition>
             <div>
               <Field name="description">
                 {({ input, meta }) => (
                   <div>
                     <label>Description</label>
                     <input {...input} type="text" placeholder="description" />
-                    <ErrorWithDelay name="description" delay={1000}>
-                      {(error: any) => <span>{error}</span>}
-                    </ErrorWithDelay>
                     {/* {meta.error && meta.touched && <span>{meta.error}</span>} */}
                   </div>
                 )}
@@ -109,9 +166,6 @@ const NewSpellForm = () => {
                       type="number"
                       placeholder="Mana requirement"
                     />
-                    <ErrorWithDelay name="requirement" delay={1000}>
-                      {(error: any) => <span>{error}</span>}
-                    </ErrorWithDelay>
                     {/* {meta.error && meta.touched && <span>{meta.error}</span>} */}
                   </div>
                 )}
